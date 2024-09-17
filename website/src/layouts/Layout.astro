@@ -1,0 +1,37 @@
+---
+const { children } = Astro.props;
+import Header from "./Header.astro";
+import Footer from "./Footer.astro";
+import "../styles/global.css"; // Import the CSS
+---
+
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Ecommerce Assessment</title>
+    <link rel="manifest" href="/manifest.json" />
+  </head>
+  <body>
+    <Header />
+    <main><slot /></main>
+    <Footer />
+  </body>
+  <script>
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker
+          .register("/service-worker.js")
+          .then((registration) => {
+            console.log(
+              "ServiceWorker registered with scope:",
+              registration.scope
+            );
+          })
+          .catch((error) => {
+            console.error("ServiceWorker registration failed:", error);
+          });
+      });
+    }
+  </script>
+</html>

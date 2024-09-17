@@ -1,0 +1,111 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+if (!Astro.cookies.has("jwt")) {
+  return Astro.redirect("/login");
+}
+---
+
+<Layout title="Welcome to Astro.">
+  <main>
+    <h1 class="text-gradient">Welcome to Our Store</h1>
+
+    <div class="menu">
+      <a href="/catalog" class="menu-item">🛒 Browse Catalog</a>
+      <a href="/cart" class="menu-item">🛍️ View Cart</a>
+    </div>
+  </main>
+</Layout>
+
+<style>
+  main {
+    margin: auto;
+    padding: 1rem;
+    width: 800px;
+    max-width: calc(100% - 2rem);
+    color: white;
+    font-size: 20px;
+    line-height: 1.6;
+    text-align: center; /* Center content horizontally */
+  }
+
+  h1 {
+    font-size: 2rem;
+    font-weight: 700;
+    background-image: linear-gradient(90deg, #ff8a00, #e52e71, #ff8a00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-size: 200%;
+    animation: gradient-animation 3s ease infinite;
+    margin-bottom: 2em;
+  }
+
+  @keyframes gradient-animation {
+    0% {
+      background-position: 0%;
+    }
+    100% {
+      background-position: 100%;
+    }
+  }
+
+  .menu {
+    display: flex;
+    justify-content: center;
+    gap: 2rem;
+    margin-top: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .menu-item {
+    padding: 1.2rem 3rem;
+    background-color: #ff8a00;
+    color: white;
+    font-size: 1.4rem;
+    text-decoration: none;
+    border-radius: 12px;
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+
+  .menu-item::before {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 300%;
+    height: 300%;
+    background: rgba(255, 255, 255, 0.2);
+    transition: all 0.5s ease;
+    border-radius: 50%;
+    z-index: -1;
+    transform: translate(-50%, -50%) scale(0);
+  }
+
+  .menu-item:hover {
+    background-color: #e52e71;
+    transform: translateY(-5px);
+    box-shadow: 0 12px 20px rgba(0, 0, 0, 0.3);
+  }
+
+  .menu-item:hover::before {
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  .menu-item:hover {
+    background-color: #e52e71;
+  }
+
+  @media (max-width: 600px) {
+    .menu {
+      flex-direction: column;
+    }
+
+    .menu-item {
+      margin-bottom: 1rem;
+    }
+  }
+</style>

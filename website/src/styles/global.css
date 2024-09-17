@@ -1,0 +1,144 @@
+/* global.css */
+
+/* Reset some basic browser styles */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Inter", sans-serif; /* Professional and clean font */
+  line-height: 1.5;
+  background-color: #f4f4f9;
+  color: #333;
+  padding-bottom: 60px; /* Prevent content from being hidden behind footer */
+  font-size: 14px; /* Smaller base font size */
+}
+
+header {
+  background-color: #2d3748; /* Darker professional color */
+  padding: 20px 0;
+  text-align: center;
+  color: white;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+header ul {
+  list-style: none;
+  padding: 0;
+}
+
+header ul li {
+  display: inline-block;
+  margin: 0 10px;
+}
+
+header ul li a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem; /* Smaller font size */
+  transition: color 0.3s ease;
+}
+
+header ul li a:hover {
+  color: #38b2ac; /* Highlight on hover with professional teal */
+}
+
+main {
+  padding: 30px;
+  max-width: 800px;
+  margin: 20px auto;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+  font-size: 0.95rem; /* Smaller font for content */
+}
+
+h1 {
+  font-size: 1.8rem; /* Smaller, professional size for headings */
+  color: #2d3748; /* Darker text color for headings */
+  margin-bottom: 20px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+}
+
+form label {
+  margin-bottom: 8px;
+  font-weight: 600;
+  font-size: 1rem;
+  color: #333;
+}
+
+form input {
+  padding: 12px;
+  margin-bottom: 15px;
+  border-radius: 6px;
+  border: 1px solid #cbd5e0;
+  font-size: 0.9rem; /* Smaller input font */
+  transition: border-color 0.3s ease;
+}
+
+form input:focus {
+  border-color: #38b2ac; /* Focus border color */
+  outline: none;
+}
+
+form button {
+  padding: 12px;
+  background-color: #38b2ac;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  font-size: 1rem; /* Slightly smaller button font */
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+form button:hover {
+  background-color: #319795;
+  transform: translateY(-2px); /* Adds a slight pop-up effect on hover */
+}
+
+form button:active {
+  transform: translateY(0); /* Reset transform on click */
+}
+
+footer {
+  text-align: center;
+  padding: 10px 0;
+  background-color: #2d3748;
+  color: white;
+  position: fixed;
+  width: 100%;
+  bottom: 0;
+  box-shadow: 0 -4px 8px rgba(0, 0, 0, 0.1);
+}
+
+footer p {
+  margin: 0;
+  font-size: 0.85rem; /* Smaller footer text */
+}
+
+/* Responsive Design for Smaller Screens */
+@media (max-width: 768px) {
+  main {
+    padding: 20px;
+    margin: 10px;
+  }
+
+  form input,
+  form button {
+    font-size: 0.85rem;
+    padding: 10px;
+  }
+
+  header ul li {
+    display: block;
+    margin: 10px 0;
+  }
+}

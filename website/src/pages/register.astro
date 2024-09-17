@@ -1,0 +1,101 @@
+---
+import Layout from "../layouts/Layout.astro";
+import axios from "axios";
+
+if (Astro.cookies.has("jwt")) {
+  return Astro.redirect("/catalog");
+}
+
+const errors = {
+  username: "",
+  email: "",
+  password: "",
+  firstName: "",
+  lastName: "",
+};
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const name = data.get("username");
+    const email = data.get("email");
+    const password = data.get("password");
+
+    if (typeof name !== "string" || name.length < 1) {
+      errors.username += "Please enter a username. ";
+    }
+    if (typeof email !== "string") {
+      errors.email += "Email is not valid. ";
+    }
+    if (typeof password !== "string" || password.length < 6) {
+      errors.password += "Password must be at least 6 characters. ";
+    }
+    const hasErrors = Object.values(errors).some((msg) => msg);
+    if (!hasErrors) {
+      try {
+        // Make Axios request for user registration
+        await axios.post(
+          "http://192.168.56.10:1337/api/auth/local/register",
+          {
+            firstName: data.get("firstName"), // Replace with actual data if needed
+            lastName: data.get("lastName"), // Replace with actual data if needed
+            username: name,
+            email: email,
+            password: password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // If successful, redirect to login with success message in query parameter
+        return Astro.redirect("/login?success=true");
+      } catch (error: unknown) {
+        // Handle the error from the Axios request
+        if (error instanceof Error) {
+          // Axios error handling
+          if (axios.isAxiosError(error)) {
+            console.error("Error in setting up request:", error.message);
+          } else {
+            // General error handling
+            console.error("Error:", error.message);
+          }
+        } else {
+          console.error("An unexpected error occurred");
+        }
+      }
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      console.error(error.message);
+    }
+  }
+}
+---
+
+<Layout>
+  <h1>Register</h1>
+  <form method="post">
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" name="firstName" required />
+    {errors.firstName && <p>{errors.firstName}</p>}
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" name="lastName" required />
+    {errors.lastName && <p>{errors.lastName}</p>}
+
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required />
+    {errors.username && <p>{errors.username}</p>}
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" required />
+    {errors.email && <p>{errors.email}</p>}
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required />
+    {errors.password && <p>{errors.password}</p>}
+
+    <button type="submit">Register</button>
+  </form>
+</Layout>

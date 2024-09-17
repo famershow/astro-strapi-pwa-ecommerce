@@ -1,0 +1,99 @@
+---
+const { product } = Astro.props;
+---
+
+<div class="product-card">
+  <div class="product-image-wrapper">
+    <img src={product.image} alt={product.name} class="product-image" />
+  </div>
+  <h3 class="product-name">{product.name}</h3>
+  <p class="product-price">${product.price.toFixed(2)}</p>
+
+  <div class="product-actions">
+    <button class="btn-add" data-product-id={product.id}>Add to Cart</button>
+  </div>
+</div>
+
+<style>
+  .product-card {
+    background-color: #fff;
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
+    transition:
+      transform 0.3s ease,
+      box-shadow 0.3s ease;
+    margin: 20px;
+    width: 280px;
+  }
+
+  .product-card:hover {
+    transform: translateY(-5px); /* Gives a floating effect on hover */
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+  }
+
+  .product-image-wrapper {
+    height: 180px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    margin-bottom: 20px;
+    border-radius: 10px;
+  }
+
+  .product-image {
+    max-height: 100%;
+    max-width: 100%;
+    transition: transform 0.3s ease;
+  }
+
+  .product-card:hover .product-image {
+    transform: scale(1.05); /* Slight zoom-in effect */
+  }
+
+  .product-name {
+    font-size: 1.4rem;
+    margin-bottom: 10px;
+    color: #333;
+    font-weight: 600;
+  }
+
+  .product-price {
+    font-size: 1.1rem;
+    color: #38b2ac;
+    margin-bottom: 20px;
+  }
+
+  .product-actions {
+    justify-content: space-between;
+  }
+
+  .btn-add,
+  .btn-remove {
+    background-color: #38b2ac;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition:
+      background-color 0.3s ease,
+      transform 0.2s ease;
+  }
+
+  .btn-add:hover {
+    background-color: #319795;
+    transform: translateY(-2px); /* Slight pop-up effect on hover */
+  }
+
+  .btn-remove {
+    background-color: #e53e3e;
+  }
+
+  .btn-remove:hover {
+    background-color: #c53030;
+    transform: translateY(-2px);
+  }
+</style>

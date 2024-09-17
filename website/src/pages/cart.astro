@@ -1,0 +1,226 @@
+---
+import Layout from "../layouts/Layout.astro";
+
+// Ensure the user is logged in by checking the JWT cookie
+if (!Astro.cookies.has("jwt")) {
+  return Astro.redirect("/login");
+}
+
+let cartItems = [];
+let total = 0;
+
+try {
+  // Fetch the current user's cart
+  const response = await fetch(
+    "http://192.168.56.10:1337/api/users/me?populate=cart,cart.image",
+    {
+      method: "GET",
+      headers: {
+        Authorization: "Bearer " + Astro.cookies.get("jwt")?.value,
+      },
+    }
+  );
+
+  if (!response.ok) {
+    throw new Error("Failed to fetch cart data");
+  }
+
+  const data = await response.json();
+
+  // Assuming the cart is an array of products
+  cartItems = data.cart || [];
+
+  // Calculate total price
+  total = cartItems.reduce((acc: any, item: any) => acc + item.price, 0);
+} catch (error) {
+  console.error("Failed to load cart:", error);
+}
+---
+
+<Layout>
+  <h1>Your Shopping Cart</h1>
+
+  {
+    cartItems.length > 0 ? (
+      <div class="cart-container">
+        <ul class="cart-list" id="cart-list">
+          {cartItems.map((item: any) => (
+            <li class="cart-item" data-id={item.id}>
+              <img
+                class="cart-image"
+                src={"http://192.168.56.10:1337" + item.image[0].url}
+                alt={item.title}
+              />
+              <div class="cart-details">
+                <h2>{item.title}</h2>
+                <p>${item.price}</p>
+              </div>
+              <button class="remove-btn" data-id={item.id}>
+                Remove
+              </button>
+            </li>
+          ))}
+        </ul>
+
+        <div class="cart-summary">
+          <p id="total">
+            Total: <strong>${total}</strong>
+          </p>
+          <button class="checkout-btn">Checkout</button>
+        </div>
+      </div>
+    ) : (
+      <p>Your cart is empty.</p>
+    )
+  }
+
+  <script>
+    async function setupRemoveButtons() {
+      const removeButtons = document.querySelectorAll(".remove-btn");
+
+      removeButtons.forEach((button) => {
+        button.addEventListener("click", async (event) => {
+          // Ensure event.target is not null and is an element
+          const buttonElement = event.target as HTMLElement;
+
+          if (buttonElement) {
+            const parentElement = buttonElement.parentElement;
+
+            if (parentElement) {
+              const itemId = buttonElement.getAttribute("data-id");
+
+              const jwtCookie = document.cookie
+                .split("; ")
+                .find((row) => row.startsWith("jwt"));
+              const jwtToken = jwtCookie ? jwtCookie.split("=")[1] : null;
+
+              if (!jwtToken) {
+                console.error("JWT token not found");
+                return; // Stop execution if no JWT is found
+              }
+
+              try {
+                const response = await fetch(
+                  `http://192.168.56.10:1337/api/users/1?populate=cart`,
+                  {
+                    method: "PUT",
+                    headers: {
+                      "Content-Type": "application/json",
+                      Authorization: "Bearer " + jwtToken,
+                    },
+                    body: JSON.stringify({
+                      cart: {
+                        disconnect: [itemId], // Disconnect (remove) the selected product ID from the cart
+                      },
+                    }),
+                  }
+                );
+
+                if (!response.ok) {
+                  throw new Error("Failed to remove product from cart");
+                }
+
+                console.log("Product removed from cart!");
+                parentElement.remove(); // Remove the parent element (the cart item)
+              } catch (error) {
+                console.error("Error removing product:", error);
+              }
+            }
+          }
+        });
+      });
+    }
+
+    // Call the function to set up the remove buttons after the DOM is loaded
+    document.addEventListener("DOMContentLoaded", () => {
+      setupRemoveButtons();
+    });
+  </script>
+</Layout>
+
+<style>
+  .cart-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-top: 20px;
+  }
+
+  .cart-list {
+    list-style: none;
+    padding: 0;
+    width: 100%;
+    max-width: 800px;
+  }
+
+  .cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    border: 1px solid #e0e0e0;
+    padding: 10px;
+    border-radius: 8px;
+    background-color: #f9f9f9;
+  }
+
+  .cart-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    margin-right: 20px;
+    border-radius: 8px;
+  }
+
+  .cart-details {
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+  }
+
+  .cart-details h2 {
+    margin: 0;
+    font-size: 1.2rem;
+  }
+
+  .cart-details p {
+    margin: 5px 0 0;
+    font-size: 1rem;
+    color: #333;
+  }
+
+  .remove-btn {
+    background-color: #ff4c4c;
+    color: white;
+    padding: 5px 10px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-left: 10px;
+  }
+
+  .remove-btn:hover {
+    background-color: #ff1c1c;
+  }
+
+  .cart-summary {
+    margin-top: 20px;
+    width: 100%;
+    max-width: 800px;
+    text-align: right;
+  }
+
+  .checkout-btn {
+    margin-top: 10px;
+    background-color: #4caf50;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+  }
+
+  .checkout-btn:hover {
+    background-color: #45a049;
+  }
+</style>

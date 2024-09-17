@@ -1,0 +1,99 @@
+---
+import Layout from "../layouts/Layout.astro"; // Ensure this path is correct
+import axios from "axios";
+
+if (Astro.cookies.has("jwt")) {
+  return Astro.redirect("/catalog");
+}
+
+let successMessage = "";
+let errorMessage = "";
+
+const params = new URL(Astro.url).searchParams;
+
+if (params.get("success") === "true") {
+  successMessage = "Registration successful! You can now log in.";
+}
+
+const errors = {
+  username: "",
+  password: "",
+};
+
+if (Astro.request.method === "POST") {
+  try {
+    const data = await Astro.request.formData();
+    const username = data.get("username");
+    const password = data.get("password");
+
+    if (typeof username !== "string" || username.length < 1) {
+      errors.username += "Please enter a username. ";
+    }
+    if (typeof password !== "string" || password.length < 6) {
+      errors.password += "Password must be at least 6 characters. ";
+    }
+
+    const hasErrors = Object.values(errors).some((msg) => msg);
+    if (!hasErrors) {
+      try {
+        // Make Axios request for user login
+        const response = await axios.post(
+          "http://192.168.56.10:1337/api/auth/local",
+          {
+            identifier: username,
+            password: password,
+          },
+          {
+            headers: {
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        // If successful, store JWT and redirect to the catalog
+        if (response.data.jwt) {
+          // Use the client-side function to store token in localStorage
+          Astro.cookies.set("jwt", response.data.jwt);
+          return Astro.redirect("/catalog");
+        }
+      } catch (error: unknown) {
+        // Handle errors from the Axios request
+        if (error instanceof Error) {
+          if (axios.isAxiosError(error)) {
+            errorMessage = "Login failed: Invalid username or password.";
+            console.error("Error in setting up request:", error.message);
+          } else {
+            console.error("Error:", error.message);
+          }
+        } else {
+          errorMessage = "An unexpected error occurred.";
+          console.error("An unexpected error occurred");
+        }
+      }
+    }
+  } catch (error) {
+    if (error instanceof Error) {
+      errorMessage = "An error occurred during login.";
+      console.error(error.message);
+    }
+  }
+}
+---
+
+<Layout>
+  <h1>Login</h1>
+  {successMessage && <p style="color: green;">{successMessage}</p>}
+  {errorMessage && <p style="color: red;">{errorMessage}</p>}
+
+  <form method="post">
+    <label for="username">Username:</label>
+    <input type="text" id="username" name="username" required />
+    {errors.username && <p style="color: red;">{errors.username}</p>}
+
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password" required />
+    {errors.password && <p style="color: red;">{errors.password}</p>}
+
+    <button type="submit">Login</button>
+  </form>
+</Layout>
